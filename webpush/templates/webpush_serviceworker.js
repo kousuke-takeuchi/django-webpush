@@ -1,3 +1,6 @@
+self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
+self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
+
 // Register event listener for the 'push' event.
 self.addEventListener('push', function(event) {
   // Retrieve the textual payload from event.data (a PushMessageData object).
@@ -11,6 +14,12 @@ self.addEventListener('push', function(event) {
     // If no url was received, it opens the home page of the website that sent the notification
     // Whitout this, it would open undefined or the service worker file.
     url = data.url ? data.url: self.location.origin;
+  
+  self.clients.matchAll({includeUncontrolled: true, type: 'window'}).then(clients => {
+    clients.forEach(client => {
+      client.postMessage({'hage' : 'hage'});
+    });
+  });
 
   // Keep the service worker alive until the notification is created.
   event.waitUntil(
@@ -30,5 +39,4 @@ self.addEventListener('notificationclick', function (event) {
     event.notification.close(),
     self.clients.openWindow(event.notification.data.url)
   );
-})
-
+});
